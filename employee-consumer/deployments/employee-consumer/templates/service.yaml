@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: agreement
+    tier: backend
+    cluster-name: {{ .Values.label.cluster_name }}
+    ssr: {{ .Values.label.ssr }}
+    project-id: {{ .Values.label.project_id }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      name: http-vendor
+      targetPort: http-vendor
+  selector:
+    app: agreement
+    tier: backend
+

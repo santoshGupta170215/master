@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: agreement
+    tier: backend
+    cluster-name: {{ .Values.label.cluster_name }}
+    ssr: {{ .Values.label.ssr }}
+    project-id: {{ .Values.label.project_id }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: agreement
+      tier: backend
+      cluster-name: {{ .Values.label.cluster_name }}
+      ssr: {{ .Values.label.ssr }}
+      project-id: {{ .Values.label.project_id }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      name: {{ .Release.Name }}
+      labels:
+        app: agreement
+        tier: backend
+        cluster-name: {{ .Values.label.cluster_name }}
+        ssr: {{ .Values.label.ssr }}
+        project-id: {{ .Values.label.project_id }}
+
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | replace ":" "" }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http-vendor
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            {{- .Values.resources | toYaml | nindent 12 }}          
+          env:
+            - name: token_auth
+              value: {{ .Values.env.token_auth }}
+
+            - name: mrktplace_proj_id
+              value: {{ .Values.env.mrktplace_proj_id }}
+
+            - name: mrktplace_serv_id
+              value: {{ .Values.env.mrktplace_serv_id }}
+
+            - name: environment
+              value: {{ .Values.env.env_tag }}
+
+            - name: kms_key_name
+              value: {{ .Values.env.kms_key_name }}
+
+            - name: env_url
+              value: {{ .Values.env.env_url }}
+
+            - name: sauth_certificates_refresh_url
+              value: {{ .Values.env.sauth_certificates_refresh_url }}
+
+            - name: sauth_audience
+              value: {{ .Values.env.sauth_audience }}
+
+            - name: ccm_context_url
+              value: {{ .Values.env.ccm_context_url }}
+
+            - name: ccm_user_role_url
+              value: {{ .Values.env.ccm_user_role_url }}
+
+            - name: service_token
+              value: {{ .Values.env.service_token }}
+
+            - name: storage_records_url
+              value: {{ .Values.env.storage_records_url }}
+
+            - name: ntm_message_uri
+              value: {{ .Values.env.ntm_message_uri }}
+
+            - name: ccm_role_uri
+              value: {{ .Values.env.ccm_role_uri }}
+
+            - name: userlist_uri_users
+              value: {{ .Values.env.userlist_uri_users }}
+
+            - name: email_notifications
+              value: {{ .Values.env.email_notifications | quote }}
+              
+            - name: role_appcode
+              value: {{ .Values.env.role_appcode}}
+
+            - name: app_key
+              value: {{ .Values.env.app_key }}
+
+            - name: build_id
+              value: {{ .Values.env.build_id | quote}}
+
+            - name: build_commit_id
+              value: {{ .Values.env.build_commit_id | quote }}
